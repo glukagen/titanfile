@@ -10,6 +10,32 @@ from accounts.industries import INDUSTRIES, INDUSTRIES_DICT
 #from shares.models import Share
 from django.contrib.localflavor.us.models import PhoneNumberField
 
+
+class Receipt(models.Model):
+    name = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=True)
+    user_created = models.ForeignKey(User, default=1, related_name='%(class)s_user_created')
+    date_created = models.DateTimeField(auto_now_add=True)
+    user_modified = models.ForeignKey(User, default=1, related_name='%(class)s_user_modified')
+    date_modified = models.DateTimeField(auto_now=True, auto_now_add=True)
+    slug = models.SlugField(blank=True, null=True)
+    transaction_id = models.CharField(max_length=100)
+    subscription_id = models.IntegerField()
+    plan_id = models.IntegerField()    
+    monthly_fee = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
+    month = models.IntegerField(default=1)
+    amount = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
+    tax_rate = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
+    subtotal = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
+    total = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
+    amount_paid = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
+    #currency = support_type = models.CharField(max_length=3, default='CAD')
+    billing_option = models.CharField(max_length=2, default='PA')    
+    cc_last_four_digit = models.CharField(max_length=100)
+    cc_first_name = models.CharField(max_length=30)
+    cc_last_name = models.CharField(max_length=30)
+
 SUPPORT_TYPES = (
     ('0', 'Community'),
     ('1', 'Email'),
@@ -91,7 +117,8 @@ class Plan(BaseModel):
     trial_period = models.IntegerField(default=30) # 30 days by default
 
     notes = models.TextField(blank=True, null=True)
-
+  
+    
 class Subscription(BaseModel):
     MONTH_TYPES = [(x, x) for x in xrange(1, 13)]
     YEAR_TYPES = [(x, x) for x in xrange(date.today().year, date.today().year + 15)]
@@ -149,6 +176,7 @@ class Subscription(BaseModel):
     cc_year = models.IntegerField(max_length=4, blank=True, null=True, default=0)
 
     notes = models.TextField(blank=True, null=True)
+        
 
 class Group(BaseModel):
     description = models.TextField(blank=True)

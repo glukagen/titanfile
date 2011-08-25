@@ -105,5 +105,6 @@ INSTALLED_APPS = (
     'accounts',
     'common', 
     'files',
-    'shares',   
+    'shares',
+    'stats',  
 )

@@ -9,7 +9,7 @@ class File(BaseModel):
     mimetype = models.CharField(max_length=64, editable=False)
     date_expires = models.DateTimeField(blank=True, null=True, default='');
     hits = models.PositiveIntegerField(editable=False, default=0)
-    account = models.ForeignKey(Subscription)
+    account = models.ForeignKey(Subscription, related_name='files')
     groups = models.ManyToManyField(Group, blank=True)
 
     def get_user_files_qs(user, active=True):
