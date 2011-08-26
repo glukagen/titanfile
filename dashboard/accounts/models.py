@@ -11,14 +11,7 @@ from accounts.industries import INDUSTRIES, INDUSTRIES_DICT
 from django.contrib.localflavor.us.models import PhoneNumberField
 
 
-class Receipt(models.Model):
-    name = models.CharField(max_length=128)
-    is_active = models.BooleanField(default=True)
-    user_created = models.ForeignKey(User, default=1, related_name='%(class)s_user_created')
-    date_created = models.DateTimeField(auto_now_add=True)
-    user_modified = models.ForeignKey(User, default=1, related_name='%(class)s_user_modified')
-    date_modified = models.DateTimeField(auto_now=True, auto_now_add=True)
-    slug = models.SlugField(blank=True, null=True)
+class Receipt(BaseModel):
     transaction_id = models.CharField(max_length=100)
     subscription_id = models.IntegerField()
     plan_id = models.IntegerField()    
@@ -117,6 +110,9 @@ class Plan(BaseModel):
     trial_period = models.IntegerField(default=30) # 30 days by default
 
     notes = models.TextField(blank=True, null=True)
+    
+    def user_count(self):
+        return self.subscriptions.count()
   
     
 class Subscription(BaseModel):
@@ -128,7 +124,7 @@ class Subscription(BaseModel):
     date_cancelled = models.DateTimeField(blank=True, null=True, default=None)
     date_deleted = models.DateTimeField(blank=True, null=True, default=None)
 
-    plan = models.ForeignKey(Plan, default=1)
+    plan = models.ForeignKey(Plan, default=1, related_name='subscriptions')
     
     owner = models.ForeignKey(User, unique=True)
     referral = models.CharField(max_length=64, blank=True, null=True, default=None)
