@@ -23,7 +23,7 @@ class Receipt(BaseModel):
     subtotal = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
     amount_paid = models.DecimalField(max_digits=16, decimal_places=2, default=0.00)
-    #currency = support_type = models.CharField(max_length=3, default='CAD')
+    currency = models.CharField(max_length=3, default='CAD')
     billing_option = models.CharField(max_length=2, default='PA')    
     cc_last_four_digit = models.CharField(max_length=100)
     cc_first_name = models.CharField(max_length=30)

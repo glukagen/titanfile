@@ -72,20 +72,23 @@ class Dashboard(models.Model):
     @staticmethod
     def churn_acquisition():
         acquired = User.objects.filter(is_active=1).count()
-        return '%d%% / %d%% / %d%%' % (
-                Dashboard.left_daily()/acquired, 
-                Dashboard.left_weekly()/acquired, 
-                Dashboard.left_monthly()/acquired)
+        return ('%d%% / %d%% / %d%%' % (
+                Dashboard.left_daily()/acquired*100, 
+                Dashboard.left_weekly()/acquired*100, 
+                Dashboard.left_monthly()/acquired*100)) if acquired != 0 else '0% / 0% / 0%'
     
     ''' Number of users who did not access the service in more than a week/month (% and number) '''
     @staticmethod
     def not_access_users():
         now = datetime.datetime.now()
-        week_count = User.objects.filter(last_login__lt=now - datetime.timedelta(days=7)).count()
-        month_count = User.objects.filter(last_login__lt=now - datetime.timedelta(days=30)).count()
+        week_count = User.objects.filter(last_login__gt=now - datetime.timedelta(days=7)).count()
+        month_count = User.objects.filter(last_login__gt=now - datetime.timedelta(days=30)).count()
         count = User.objects.count()
-        return "%d%%(%d) / %d%%(%d)" % (week_count/float(count)*100,
-                week_count, month_count/float(count)*100, month_count)
+        return "%d%%(%d) / %d%%(%d)" % (
+                week_count/float(count)*100 if count else 0,
+                week_count, 
+                month_count/float(count)*100 if count else 0, 
+                month_count)
     
     ''' Number of users who did not activate their account (% and number) '''
     @staticmethod
@@ -95,38 +98,38 @@ class Dashboard(models.Model):
     ''' Average number of files per user '''
     @staticmethod
     def average_files():
-        return '%.1f' % Subscription.objects.annotate(files_count=Count('files')
-                    ).aggregate(Avg('files_count'))['files_count__avg']
+        average = Subscription.objects.annotate(files_count=Count('files')
+                    ).aggregate(Avg('files_count'))['files_count__avg']                    
+        return '%.1f' % (average if average else 0)
     
     ''' Average number of shares per user '''
     @staticmethod
     def average_shares():
-        query = 'select a.id, avg(c) average from (select a.id, count(a.id) c from shares_share s join auth_user a on a.id=s.user_created_id group by a.id)a'
-        return '%.1f' % User.objects.raw(query)[0].average
+        query = 'select id, avg(c) average from (select a.id, count(s.id) c from auth_user a left join shares_share s on s.user_created_id=a.id group by a.id) b'
+        average = User.objects.raw(query)[0].average
+        return '%.1f' % (average if average else 0)
     
     ''' Average length of a user lifetime (in months) '''
     @staticmethod
     def average_lifetime_in_months():
-        date_int = str(int(Subscription.objects.filter(
-            is_active=1,
-            date_cancelled__isnull=True,
-            date_deleted__isnull=True, 
-            date_created__isnull=False
-            ).aggregate(Avg('date_created'))['date_created__avg']))
-        delta = datetime.date.today() - datetime.date(int(date_int[:4]), int(date_int[4:6]), int(date_int[6:8]))
-        return '%.1f' % (delta.days/30.0)
+        query = """select *, from_unixtime(avg(unix_timestamp(date_created))) average 
+            from accounts_subscription where date_cancelled is null and date_deleted is null and date_created is not null """
+        average = User.objects.raw(query)[0].average
+        return '%.1f' % ((datetime.datetime.now() - average).days/30.0 if average else 0)
     
     ''' Average lifetime value of a user (in dollars) '''
     @staticmethod
     def average_lifetime_in_dollars():
         query = 'select id, avg(s) average from (select id, sum(amount) s from accounts_receipt group by user_created_id)a'
-        return '%.2f' % Receipt.objects.raw(query)[0].average
+        average = Receipt.objects.raw(query)[0].average
+        return '%.2f' % (average if average else 0)
     
     ''' Recurring monthly revenue '''
     @staticmethod
     def monthly_revenue():
-        return '%.2f' % Receipt.objects.filter(
-                date_created__month=datetime.date.today().month).aggregate(Sum('amount'))['amount__sum']
+        sum = Receipt.objects.filter(
+                date_created__month=datetime.date.today().month).aggregate(Sum('amount'))['amount__sum']                
+        return '%.2f' % (sum if sum else 0)
         
 ''' Created to show user count statistics per country '''
 class Country(models.Model):
