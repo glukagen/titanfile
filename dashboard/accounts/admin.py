@@ -2,6 +2,7 @@ from accounts.models import Group, UserProfile, Subscription, Plan, Subscription
 from django.contrib import admin
 from common.admin import BaseAdmin
 from reversion.admin import VersionAdmin
+#from django.contrib.admin import ModelAdmin as VersionAdmin
 
 class PlanAdmin(VersionAdmin):
     list_display = ('id', 'status', 'name', 'date_activated', 'date_inactivated', 

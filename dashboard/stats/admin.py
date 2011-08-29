@@ -45,8 +45,7 @@ class CountryAdmin(admin.ModelAdmin):
             if c.count != s_count:
                 c.count = s_count
                 c.save()
-                
-        print "test"
+
 
 
 admin.site.register(Country, CountryAdmin)

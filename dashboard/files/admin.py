@@ -8,6 +8,6 @@ class FileAdmin(BaseAdmin):
     #list_display = ('hits', 'date_expires')
     #list_display=('name', 'user_created', 'date_created', 'user_modified', 'date_modified', 'is_active')
     #list_display=('name', 'user_created')
-    pass
+
 
 admin.site.register(File, FileAdmin)

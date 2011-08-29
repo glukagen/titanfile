@@ -1,6 +1,8 @@
 from common.models import BaseModel
 from django.contrib import admin
 from reversion.admin import VersionAdmin
+#from django.contrib.admin import ModelAdmin as VersionAdmin
+
 
 class BaseAdmin(VersionAdmin):
     list_display=('name', 'date_created', 'date_modified', 'is_active')

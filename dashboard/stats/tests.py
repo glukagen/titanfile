@@ -9,23 +9,26 @@ import random
 import decimal
 
 
-''' Test stats Dashboard class methods'''
+
 class DashboardTest(unittest.TestCase):
-       
-    ''' create and return user with random name '''     
+    ''' Test stats Dashboard class methods'''
+    
     def getUser(self):
+        ''' create and return user with random name '''
         user = User.objects.create_user("%s%s" %('test', random.random()), 'tt@tt.com', 'testpassword')
         user.save()
         return user
     
-    ''' create and return default subscription for current user '''
+    
     def getSubscription(self, user):
+        ''' create and return default subscription for current user '''
         s = Subscription(owner=user, monthly_fee=0)
         s.save()
         return s
     
-    ''' test method Dashboard.total_users() ''' 
     def test_total_users(self):
+        ''' test method Dashboard.total_users() ''' 
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.total_users(), 0)
         u = self.getUser()
@@ -34,8 +37,9 @@ class DashboardTest(unittest.TestCase):
         u.delete()
         self.failUnlessEqual(Dashboard.total_users(), 0)
         
-    ''' test method Dashboard.average_signups() '''
     def test_average_signups(self):
+        ''' test method Dashboard.average_signups() '''
+        
         # Empty database has no signups
         self.failUnlessEqual(Dashboard.average_signups(), '0 / 0 / 0')
         
@@ -58,8 +62,8 @@ class DashboardTest(unittest.TestCase):
         u.delete()        
         self.failUnlessEqual(Dashboard.average_signups(), '0 / 0 / 0')
         
-    ''' test method Dashboard.left_daily() '''
     def test_left_daily(self):
+        ''' test method Dashboard.left_daily() '''
         u = self.getUser()
         now = datetime.datetime.now()
         
@@ -78,8 +82,9 @@ class DashboardTest(unittest.TestCase):
         u.delete()        
         self.failUnlessEqual(Dashboard.left_monthly(), 0)
         
-    ''' test method Dashboard.left_weekly() '''
     def test_left_weekly(self):
+        ''' test method Dashboard.left_weekly() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.left_weekly(), 0)
         
@@ -98,8 +103,9 @@ class DashboardTest(unittest.TestCase):
         u.delete()  
         self.failUnlessEqual(Dashboard.left_monthly(), 0)
         
-    ''' test method Dashboard.left_monthly() '''
     def test_left_monthly(self):
+        ''' test method Dashboard.left_monthly() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.left_monthly(), 0)
         
@@ -118,8 +124,10 @@ class DashboardTest(unittest.TestCase):
         u.delete()        
         self.failUnlessEqual(Dashboard.left_monthly(), 0)
     
-    ''' test method Dashboard.churn_rage_per_time() '''
+    
     def test_churn_rage_per_time(self):
+        ''' test method Dashboard.churn_rage_per_time() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.churn_rage_per_time(), '0 / 0 / 0')
         
@@ -152,8 +160,9 @@ class DashboardTest(unittest.TestCase):
         u.delete()
         self.failUnlessEqual(Dashboard.churn_rage_per_time(), '0 / 0 / 0')
     
-    ''' test method Dashboard.churn_acquisition() '''
     def test_churn_acquisition(self):
+        ''' test method Dashboard.churn_acquisition() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.churn_acquisition(), '0% / 0% / 0%')
         
@@ -185,8 +194,9 @@ class DashboardTest(unittest.TestCase):
         u.delete()
         self.failUnlessEqual(Dashboard.churn_acquisition(), '0% / 0% / 0%')
         
-    ''' test method Dashboard.not_access_users() '''
     def test_not_access_users(self):
+        ''' test method Dashboard.not_access_users() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.not_access_users(), '0%(0) / 0%(0)')
         
@@ -211,8 +221,9 @@ class DashboardTest(unittest.TestCase):
         u2.delete()        
         self.failUnlessEqual(Dashboard.not_access_users(), '0%(0) / 0%(0)')
     
-    ''' test method Dashboard.not_activate_users() '''
     def test_not_activate_users(self):
+        ''' test method Dashboard.not_activate_users() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.not_activate_users(), 0)
         
@@ -226,14 +237,15 @@ class DashboardTest(unittest.TestCase):
         u.delete()
         self.failUnlessEqual(Dashboard.not_activate_users(), 0  )
     
-    ''' create file for current subscription '''
     def getFile(self, subscription):
+        ''' create file for current subscription '''
         file = File(date_expires=datetime.datetime.now(), account=subscription)
         file.save()
         return file
     
-    ''' test method Dashboard.average_files() '''
     def test_average_files(self):
+        ''' test method Dashboard.average_files() '''
+        
         # Empty database has no files
         self.failUnlessEqual(Dashboard.average_files(), '0.0')
         
@@ -257,14 +269,15 @@ class DashboardTest(unittest.TestCase):
         u2.delete()
         self.failUnlessEqual(Dashboard.average_files(), '0.0')
     
-    ''' create share for current sender '''
     def getShare(self, user):
+        ''' create share for current user '''
         share = Share(user_created=user)
         share.save()
         return share
     
-    ''' test method Dashboard.average_shares() '''
     def test_average_shares(self):
+        ''' test method Dashboard.average_shares() '''
+        
         # Empty database has no shares
         self.failUnlessEqual(Dashboard.average_shares(), '0.0')
         
@@ -287,14 +300,16 @@ class DashboardTest(unittest.TestCase):
         self.failUnlessEqual(Dashboard.average_shares(), '0.0')
     
     def getReceipt(self, subscription, amount):    
+        ''' create receipt with initial subscription and amount'''
         receipt = Receipt(amount=amount, user_created=subscription.owner, monthly_fee=0,
                     tax_rate=0, tax_amount=0, transaction_id=random.random(),
                 subtotal=0, total=0, amount_paid=0, subscription_id=subscription.id, plan_id=1)
         receipt.save()
         return receipt
     
-    ''' test method Dashboard.average_lifetime_in_months() '''
     def test_average_lifetime_in_months(self):
+        ''' test method Dashboard.average_lifetime_in_months() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.average_lifetime_in_months(), '0.0')
         
@@ -320,9 +335,9 @@ class DashboardTest(unittest.TestCase):
         u2.delete()
         self.failUnlessEqual(Dashboard.average_lifetime_in_months(), '0.0')
         
-    
-    ''' test method Dashboard.average_lifetime_in_dollars() '''
     def test_average_lifetime_in_dollars(self):
+        ''' test method Dashboard.average_lifetime_in_dollars() '''
+        
         # Empty database has no users
         self.failUnlessEqual(Dashboard.average_lifetime_in_dollars(), '0.00')
         
@@ -348,9 +363,9 @@ class DashboardTest(unittest.TestCase):
         u2.delete()
         self.failUnlessEqual(Dashboard.average_lifetime_in_dollars(), '0.00')
 
-    
-    ''' test method Dashboard.monthly_revenue() '''
     def test_monthly_revenue(self):
+        ''' test method Dashboard.monthly_revenue() '''
+        
         # Empty database has no receipts
         self.failUnlessEqual(Dashboard.monthly_revenue(), '0.00')
         u = self.getUser()
